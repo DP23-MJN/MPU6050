@@ -1,8 +1,8 @@
 /*
- * 
- * 
- * 
- * 
+ * i2c2.h
+ * -- for STM32F7
+ * Author: Nick Fan
+ * Date: 6/2023
  */
 
 
@@ -10,20 +10,41 @@
 #define F7_I2C2_H
 
 #include "stm32f7xx.h"
+#include "stdbool.h"
 
-#define RCC_GPIOF_EN 0x01 << 5 // RCC_AHB1ENR
-#define RCC_I2C2_EN 0x01 << 22 // RCC_APB1ENR
-#define I2C2_CR1_PE 0x01
-#define GPIOF_REG0_0 0x01
-#define GPIOF_REG0_1 0x01 << 1
-#define GPIOF_REG1_0 0x01 << 2
-#define GPIOF_REG1_1 0x01 << 3
-#define GPIOF_REG0 0x01
-#define GPIOF_REG1 0x01 << 1
+#define I2C_REQUEST_SIZE 0x1U << 0U
 
+// Function prototypes
+
+/*
+ * @brief Initializes I2C2 peripheral
+ */
 void I2C2_init(void);
+
+/* 
+ * @brief Sets I2C2 Device Address
+ * @param DAddress I2C Peripheral Device Address
+ */
 void I2C2_SetDevice(uint8_t DAddress);
+
+/* 
+ * @brief Performs a burst memory write in I2C2
+ * @param MemAddress register address of peripheral to access
+ * @param data pointer(s) to bytes to send
+ * @param size the number of bytes to send
+ * @param timeout the timeout in milliseconds
+ * @retval The completion status
+*/
 int I2C2_MemWrite(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
+
+/* 
+ * @brief Performs a burst memory read in I2C2
+ * @param MemAddress register address of peripheral to access
+ * @param data pointer(s) for storing received data
+ * @param size the number of bytes to read
+ * @param timeout the timeout in milliseconds
+ * @retval The completion status
+*/
 int I2C2_MemRead(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
 
 #endif // F7_I2C2_H

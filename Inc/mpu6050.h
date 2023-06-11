@@ -1,4 +1,5 @@
-/* mpu6050.h
+/* 
+ * mpu6050.h
  * Author: Nick Fan
  * Date: 6/2023
  */
@@ -48,8 +49,9 @@
 
 // Function pointers
 typedef void(*I2C_Init)();
-typedef void(*I2C_MemWrite)(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
-typedef void(*I2C_MemRead)(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
+typedef void(*I2C_MemAccess)(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
+typedef MPU6050_Status(*MPU6050_Read_Single)(MPU6050_I2C hi2c, uint8_t *data);
+typedef MPU6050_Status(*MPU6050_Read_Two)(MPU6050_I2C hi2c, uint8_t *accelData, uint8_t *gyroData);
 
 typedef enum {
     MPU_OK = 0x01,
@@ -58,13 +60,14 @@ typedef enum {
 
 typedef struct {
     I2C_Init Init;
-    I2C_MemWrite MemWrite;
-    I2C_MemRead MemRead;
+    I2C_MemAccess MemWrite;
+    I2C_MemAccess MemRead;
 } MPU6050_I2C;
 
-MPU6050_Status MPU6050_init(MPU6050_I2C i2c);
-MPU6050_Status MPU6050_ReadAccel(uint8_t *accelData);
-MPU6050_Status MPU6050_ReadGyro(uint8_t *gyroData);
-MPU6050_Status MPU6050_ReadAll(uint8_t *accelData, uint8_t *gyroData);
+// Function prototypes
+MPU6050_Status MPU6050_init(MPU6050_I2C *hi2c);
+MPU6050_Status MPU6050_ReadAccel(MPU6050_I2C *hi2c, uint8_t *accelData);
+MPU6050_Status MPU6050_ReadGyro(MPU6050_I2C *hi2c, uint8_t *gyroData);
+MPU6050_Status MPU6050_ReadAll(MPU6050_I2C *hi2c, uint8_t *accelData, uint8_t *gyroData);
 
 #endif // MPU6050_H
