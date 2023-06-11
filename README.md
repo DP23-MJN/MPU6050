@@ -1,0 +1,2 @@
+# MPU6050
+MPU6050 6-DOF IMU API for STM32. I2C drivers based on STM32F7.
