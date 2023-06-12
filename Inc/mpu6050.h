@@ -87,8 +87,8 @@ typedef struct {
 } MPU6050_I2C;
 
 // Function Pointers
-typedef MPU6050_Status(*MPU6050_Read_Single)(MPU6050_I2C *hi2c, uint8_t *data);
-typedef MPU6050_Status(*MPU6050_Read_Two)(MPU6050_I2C *hi2c, uint8_t *accelData, uint8_t *gyroData);
+typedef MPU6050_Status(*MPU6050_Read_Single)(MPU6050_I2C *hi2c, float *data);
+typedef MPU6050_Status(*MPU6050_Read_Two)(MPU6050_I2C *hi2c, float *accelData, float *gyroData);
 
 
 // Function prototypes
@@ -105,7 +105,7 @@ MPU6050_Status MPU6050_init(MPU6050_I2C *hi2c);
  * @param accelData The buffer to store accel data, minimum size 3
  * @retval The completion status
 */
-MPU6050_Status MPU6050_ReadAccel(MPU6050_I2C *hi2c, uint8_t *accelData);
+MPU6050_Status MPU6050_ReadAccel(MPU6050_I2C *hi2c, float *accelData);
 
 /* 
  * @brief Reads Gyroscope data from MPU6050
@@ -113,7 +113,7 @@ MPU6050_Status MPU6050_ReadAccel(MPU6050_I2C *hi2c, uint8_t *accelData);
  * @param gyroData The buffer to store gyro data, minimum size 3
  * @retval The completion status
 */
-MPU6050_Status MPU6050_ReadGyro(MPU6050_I2C *hi2c, uint8_t *gyroData);
+MPU6050_Status MPU6050_ReadGyro(MPU6050_I2C *hi2c, float *gyroData);
 
 /* 
  * @brief Initializes MPU6050 on I2C
@@ -122,6 +122,6 @@ MPU6050_Status MPU6050_ReadGyro(MPU6050_I2C *hi2c, uint8_t *gyroData);
  * @param gyroData The buffer to store gyro data, minimum size 3
  * @retval The completion status
 */
-MPU6050_Status MPU6050_ReadAll(MPU6050_I2C *hi2c, uint8_t *accelData, uint8_t *gyroData);
+MPU6050_Status MPU6050_ReadAll(MPU6050_I2C *hi2c, float *accelData, float *gyroData);
 
 #endif // MPU6050_H

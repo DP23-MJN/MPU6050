@@ -53,24 +53,21 @@ MPU6050_Status MPU6050_init(MPU6050_I2C *hi2c) {
     return MPU_OK;
 }
 
-MPU6050_Status MPU6050_ReadAccel(MPU6050_I2C *hi2c, uint8_t *accelData) {
+MPU6050_Status MPU6050_ReadAccel(MPU6050_I2C *hi2c, float *accelData) {
     hi2c->MemRead(MPU6050_REG_ACCEL_XOUT_H, accelBuff, 6, I2C_DELAY);
-    accelData[0] = (int16_t) (accelBuff[0] << 8 | accelBuff[1]);
-    accelData[1] = (int16_t) (accelBuff[2] << 8 | accelBuff[3]);
-    accelData[2] = (int16_t) (accelBuff[4] << 8 | accelBuff[5]);
-    /*for (uint8_t i = 0; i <= 2; ++i) {
+    for (uint8_t i = 0; i <= 2; ++i) {
         accelData[i] = (int16_t) (accelBuff[i] << 8 | accelBuff[++i]) / ACCEL_DIVIDER;
-    }*/
+    }
 }
 
-MPU6050_Status MPU6050_ReadGyro(MPU6050_I2C *hi2c, uint8_t *gyroData) {
+MPU6050_Status MPU6050_ReadGyro(MPU6050_I2C *hi2c, float *gyroData) {
     hi2c->MemRead(MPU6050_REG_GYRO_XOUT_H, gyroBuff, 6, I2C_DELAY);
-    gyroData[0] = (int16_t) (gyroBuff[0] << 8 | gyroBuff[1]);
-    gyroData[1] = (int16_t) (gyroBuff[2] << 8 | gyroBuff[3]);
-    gyroData[2] = (int16_t) (gyroBuff[4] << 8 | gyroBuff[5]);
+    for (uint8_t i = 0; i <= 2; ++i) {
+        gyroData[i] = (int16_t) (gyroBuff[i] << 8 | gyroBuff[++i]) / GYRO_DIVIDER;
+    }
 }
 
-MPU6050_Status MPU6050_ReadAll(MPU6050_I2C *hi2c, uint8_t *accelData, uint8_t *gyroData) {
+MPU6050_Status MPU6050_ReadAll(MPU6050_I2C *hi2c, float *accelData, float *gyroData) {
     hi2c->MemRead(MPU6050_REG_ACCEL_XOUT_H, accelBuff, 6, I2C_DELAY);
     hi2c->MemRead(MPU6050_REG_GYRO_XOUT_H, gyroBuff, 6, I2C_DELAY);
     for (uint8_t i = 0; i <= 2; ++i) {
