@@ -20,7 +20,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "main.h"
-#include "i2c2.h"
+#include "f74_i2c2.h"
 #include "mpu6050.h"
 
 /* Private includes ----------------------------------------------------------*/

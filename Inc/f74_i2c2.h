@@ -1,6 +1,6 @@
 /*
- * i2c2.h
- * -- for STM32F7
+ * f74_i2c2.h
+ * -- for STM32F75xxx/STM32F74xxx
  * Author: Nick Fan
  * Date: 6/2023
  */
