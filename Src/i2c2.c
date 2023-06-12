@@ -70,14 +70,14 @@ void I2C2_SetDevice(uint8_t DAddress) {
 }
 
 
-int I2C2_MemWrite(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout) {
+void I2C2_MemWrite(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout) {
     // Check init
     if (!init) {
-        return 1;
+        return /*1*/;
     }
     // Check start bit
     if (I2C2->CR2 & I2C_CR2_START) {
-        return 1;
+        return /*1*/;
     }
 
     /*
@@ -92,7 +92,7 @@ int I2C2_MemWrite(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t time
     );
 
     I2C2->CR2 |= (
-        (size + I2C_REQUEST_SIZE) << I2C_CR2_NBYTES_Pos // Size
+        ((size + I2C_REQUEST_SIZE) << I2C_CR2_NBYTES_Pos) // Size
         | I2C_CR2_AUTOEND // Autoend
         | I2C_CR2_START // Start
     );
@@ -106,7 +106,7 @@ int I2C2_MemWrite(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t time
         
         if (I2C2->ISR & I2C_ISR_NACKF) { // NACKF received
             I2C2->ICR |= I2C_ICR_NACKCF; // Clear flag
-            return 2;
+            return /*2*/;
         }
 
         while (!(I2C2->ISR & I2C_ISR_TXIS)); // TXIS flag, add timeout?
@@ -117,19 +117,19 @@ int I2C2_MemWrite(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t time
     while (!(I2C2->ISR & I2C_ISR_STOPF)); // STOP detect flag, add timeout?
     I2C2->ICR |= I2C_ICR_STOPCF; // Clear stop flag
 
-    return 0;
+    return /*0*/;
 
 }
 
 
-int I2C2_MemRead(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout) {
+void I2C2_MemRead(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout) {
     // Check init
     if (!init) {
-        return 1;
+        return /*1*/;
     }
     // Check start bit
     if (I2C2->CR2 & (I2C_CR2_START)) {
-        return 1;
+        return /*1*/;
     }
 
     /*
@@ -181,6 +181,6 @@ int I2C2_MemRead(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeo
     while (!(I2C2->ISR & I2C_ISR_STOPF)); // STOP detect flag, add timeout?
     I2C2->ICR |= I2C_ICR_STOPCF;
 
-    return 0;
+    return /*0*/;
 
 }

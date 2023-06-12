@@ -17,6 +17,8 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <string.h>
+#include <stdio.h>
 #include "main.h"
 #include "i2c2.h"
 #include "mpu6050.h"

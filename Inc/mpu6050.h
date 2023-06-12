@@ -69,23 +69,27 @@
 #define INIT_USER_CTL(data)             hi2c->MemWrite(MPU6050_REG_USER_CTL, data, 1, I2C_DELAY) // User Ctl setup
 #define INIT_PWR_MNG1(data)             hi2c->MemWrite(MPU6050_REG_PWR_MGMT_1, data, 1, I2C_DELAY) // Power Mng 1 setup
 
-// Function pointers
-typedef void(*I2C_Init)();
-typedef void(*I2C_MemAccess)(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
-typedef MPU6050_Status(*MPU6050_Read_Single)(MPU6050_I2C hi2c, uint8_t *data);
-typedef MPU6050_Status(*MPU6050_Read_Two)(MPU6050_I2C hi2c, uint8_t *accelData, uint8_t *gyroData);
-
-// User types
+// Enums
 typedef enum {
     MPU_OK = 0x01,
     MPU_ERROR = 0x00
 } MPU6050_Status;
 
+// Function pointers
+typedef void(*I2C_Init)();
+typedef void(*I2C_MemAccess)(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
+
+// Structs
 typedef struct {
     I2C_Init Init;
     I2C_MemAccess MemWrite;
     I2C_MemAccess MemRead;
 } MPU6050_I2C;
+
+// Function Pointers
+typedef MPU6050_Status(*MPU6050_Read_Single)(MPU6050_I2C *hi2c, uint8_t *data);
+typedef MPU6050_Status(*MPU6050_Read_Two)(MPU6050_I2C *hi2c, uint8_t *accelData, uint8_t *gyroData);
+
 
 // Function prototypes
 /* 

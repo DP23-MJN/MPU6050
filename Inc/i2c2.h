@@ -33,9 +33,8 @@ void I2C2_SetDevice(uint8_t DAddress);
  * @param data pointer(s) to bytes to send
  * @param size the number of bytes to send
  * @param timeout the timeout in milliseconds
- * @retval The completion status
 */
-int I2C2_MemWrite(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
+void I2C2_MemWrite(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
 
 /* 
  * @brief Performs a burst memory read in I2C2
@@ -43,8 +42,7 @@ int I2C2_MemWrite(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t time
  * @param data pointer(s) for storing received data
  * @param size the number of bytes to read
  * @param timeout the timeout in milliseconds
- * @retval The completion status
 */
-int I2C2_MemRead(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
+void I2C2_MemRead(uint8_t MemAddress, uint8_t* data, uint8_t size, uint32_t timeout);
 
 #endif // F7_I2C2_H
