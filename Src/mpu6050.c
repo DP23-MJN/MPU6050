@@ -17,7 +17,7 @@ MPU6050_Status MPU6050_init(MPU6050_I2C *hi2c) {
     hi2c->Init();
 
     // Check device address
-    hi2c->MemRead(MPU6050_REG_WHO_AM_I, &address, 1, 5000);
+    hi2c->MemRead(MPU6050_REG_WHO_AM_I, &address, 1, I2C_DELAY);
 
     if (address != MPU6050_I2C_ADDRESS >> 1) {
         return MPU_ERROR;
