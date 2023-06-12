@@ -17,6 +17,8 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <string.h>
+#include <stdio.h>
 #include "main.h"
 #include "i2c2.h"
 #include "mpu6050.h"
@@ -59,6 +61,12 @@ static void MX_USART3_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
+void MPU6050_I2C_Init(void) {
+  I2C2_init();
+  I2C2_SetDevice(MPU6050_I2C_ADDRESS);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -93,13 +101,15 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  /*I2C2_init();
-  I2C2_SetDevice(0x68 << 1);*/
+  MPU6050_I2C hi2c2 = {
+    &MPU6050_I2C_Init,
+    &I2C2_MemWrite,
+    &I2C2_MemRead
+  };
   uint8_t buff[20] = {};
-  //uint8_t testData[1] = {0x02};
-  int success = MPU6050_init();
-  uint8_t gyro[6] = {};
-  uint8_t accel[6] = {};
+  MPU6050_Status success = MPU6050_init(&hi2c2);
+  float gyro[6] = {};
+  float accel[6] = {};
 
   //0x75 = whoami
 
@@ -110,8 +120,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    MPU6050_ReadAll(accel, gyro);
-    sprintf(buff, "A:%d %d %d G:%d %d %d", accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2]);
+    MPU6050_ReadAll(&hi2c2, accel, gyro);
+    sprintf(buff, "A:%f %f %f G:%f %f %f", accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2]);
     HAL_UART_Transmit(&huart3, buff, strlen(buff), HAL_MAX_DELAY);
     HAL_Delay(1000);
 
