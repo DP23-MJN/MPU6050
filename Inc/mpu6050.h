@@ -8,7 +8,7 @@
 #define MPU6050_H
 
 // Includes
-#include "stdint.h"
+#include <stdint.h>
 
 // Device Address and Reset Values
 #define MPU6050_I2C_ADDRESS             0x68 << 1
@@ -88,9 +88,36 @@ typedef struct {
 } MPU6050_I2C;
 
 // Function prototypes
+/* 
+ * @brief Initializes MPU6050 on I2C
+ * @param hi2c The I2C handler to initialize with
+ * @retval The completion status
+*/
 MPU6050_Status MPU6050_init(MPU6050_I2C *hi2c);
+
+/* 
+ * @brief Reads Accelerometer data from MPU6050
+ * @param hi2c The I2C handler to read with
+ * @param accelData The buffer to store accel data, minimum size 3
+ * @retval The completion status
+*/
 MPU6050_Status MPU6050_ReadAccel(MPU6050_I2C *hi2c, uint8_t *accelData);
+
+/* 
+ * @brief Reads Gyroscope data from MPU6050
+ * @param hi2c The I2C handler to read with
+ * @param gyroData The buffer to store gyro data, minimum size 3
+ * @retval The completion status
+*/
 MPU6050_Status MPU6050_ReadGyro(MPU6050_I2C *hi2c, uint8_t *gyroData);
+
+/* 
+ * @brief Initializes MPU6050 on I2C
+ * @param hi2c The I2C handler to initialize with
+ * @param accelData The buffer to store accel data, minimum size 3
+ * @param gyroData The buffer to store gyro data, minimum size 3
+ * @retval The completion status
+*/
 MPU6050_Status MPU6050_ReadAll(MPU6050_I2C *hi2c, uint8_t *accelData, uint8_t *gyroData);
 
 #endif // MPU6050_H

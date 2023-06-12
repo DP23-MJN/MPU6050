@@ -4,7 +4,6 @@
  * Date: 6/2023
  */
 
-#include "i2c2.h"
 #include "mpu6050.h"
 
 
@@ -51,7 +50,7 @@ MPU6050_Status MPU6050_init(MPU6050_I2C *hi2c) {
 
     INIT_PWR_MNG1(&(uint8_t){MPU6050_CLKSEL_GYRO_X});
 
-    return MPU_OK
+    return MPU_OK;
 }
 
 MPU6050_Status MPU6050_ReadAccel(MPU6050_I2C *hi2c, uint8_t *accelData) {
