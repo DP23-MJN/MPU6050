@@ -1,11 +1,11 @@
 /*
- * i2c2.c
- * -- for STM32F7
+ * f74_i2c2.c
+ * -- for STM32F75xxx/STM32F74xxx
  * Author: Nick Fan
  * Date: 6/2023
  */
 
-#include "i2c2.h"
+#include "f74_i2c2.h"
 
 static uint8_t init = false;
 
