@@ -86,11 +86,6 @@ typedef struct {
     I2C_MemAccess MemRead;
 } MPU6050_I2C;
 
-// Function Pointers
-typedef MPU6050_Status(*MPU6050_Read_Single)(MPU6050_I2C *hi2c, float *data);
-typedef MPU6050_Status(*MPU6050_Read_Two)(MPU6050_I2C *hi2c, float *accelData, float *gyroData);
-
-
 // Function prototypes
 /* 
  * @brief Initializes MPU6050 on I2C
