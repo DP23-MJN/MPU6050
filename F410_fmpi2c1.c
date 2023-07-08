@@ -43,7 +43,29 @@ void FMPI2C1_Init(void) {
 
 	/* DMA SETUP */
 
+	/*
+	 * I2C4 TX: Stream 1 Channel 2
+	 * I2C4 RX: Stream 3 channel 1
+	 */
 
+	// Clear CHSEL bits, turn off double buffer, set PSIZE 8 bits, set DMA flow controller
+	DMA1_Stream1->CR &= ~(DMA_SxCR_CHSEL_Msk | DMA_SxCR_DBM_Msk
+						| DMA_SxCR_PSIZE_Msk | DMA_SxCR_PFCTRL_Msk);
+	DMA1_Stream3->CR &= ~(DMA_SxCR_CHSEL_Msk | DMA_SxCR_DBM_Msk
+						| DMA_SxCR_PSIZE_Msk | DMA_SxCR_PFCTRL_Msk);
+
+	/* Select 010 for stream 1 channel 2 and 001 for stream 3 channel 1
+	 * Enable memory increment mode, enable circular mode
+	 */
+	DMA1_Stream1->CR |= (DMA_SxCR_CHSEL_1 | DMA_SxCR_MINC | DMA_SxCR_CIRC);
+	DMA1_Stream3->CR |= (DMA_SxCR_CHSEL_0 | DMA_SxCR_MINC | DMA_SxCR_CIRC);
+
+	DMA1_Stream1->CR |= DMA_SxCR_DIR_0; // Set direction memory to peripheral
+	DMA1_Stream3->CR &= ~DMA_SxCR_DIR_Msk; // Set direction peripheral to memory
+
+	// Set direct mode enabled
+	DMA1_Stream1->FCR &= ~(DMA_SxFCR_DMDIS_Msk);
+	DMA1_Stream3->FCR &= ~(DMA_SxFCR_DMDIS_Msk);
 
 	/* FMPI2C SETUP */
 
@@ -57,9 +79,6 @@ void FMPI2C1_Init(void) {
 	// Set 7-bit addressing mode, Reload never used in API
 	FMPI2C1->CR2 &= ~(FMPI2C_CR2_ADD10 | FMPI2C_CR2_RELOAD);
 
-	// Enable DMA transactions
-	//FMPI2C1->CR1 |= (FMPI2C_CR1_TXDMAEN, FMPI2C_CR1_RXDMAEN);
-
 	// Set TIMINGR PRESC, SCLH, SCLL
 	FMPI2C1->TIMINGR &= CLEAR_REGISTER;
 	FMPI2C1->TIMINGR |= CUBEMX_TIMINGR;
@@ -67,6 +86,27 @@ void FMPI2C1_Init(void) {
 	// Enable FMPI2C
 	FMPI2C1->CR1 |= FMPI2C_CR1_PE;
 
+}
+
+static void FMPI2C1_DMA_Enable() {
+	// Enable I2C DMA transactions
+	FMPI2C1->CR1 |= (FMPI2C_CR1_TXDMAEN | FMPI2C_CR1_RXDMAEN);
+
+	// Stream enable
+	DMA1_Stream1->CR |= DMA_SxCR_EN;
+	DMA1_Stream3->CR |= DMA_SxCR_EN;
+}
+
+static void FMPI2C1_DMA_Disable() {
+	// Disable I2C DMA transactions
+	FMPI2C1->CR1 &= ~(FMPI2C_CR1_TXDMAEN | FMPI2C_CR1_RXDMAEN);
+
+	// Stream disable
+	DMA1_Stream1->CR &= ~DMA_SxCR_EN;
+	DMA1_Stream3->CR &= ~DMA_SxCR_EN;
+
+	// Wait for current transactions to complete and stream to be disabled
+	while ((DMA1_Stream1->CR & DMA_SxCR_EN) || (DMA1_Stream3->CR & DMA_SXCR_EN));
 }
 
 void FMPI2C1_SetDevice(uint8_t deviceID) {
@@ -154,6 +194,69 @@ SerialStatus FMPI2C1_MemRead(uint8_t address, uint8_t *data, uint8_t size) {
 	// Check for stop flag and clear stop flag
 	while(!(FMPI2C1->ISR & FMPI2C_ISR_STOPF));
 	FMPI2C1->ICR |= FMPI2C_ICR_STOPCF;
+
+	return SERIAL_OK;
+
+}
+
+SerialStatus FMPI2C1_MemWrite_DMA(uint8_t address, uint8_t *txdata, uint8_t size) {
+
+	// Check if previous start has been sent already
+	if (FMPI2C1->CR2 & FMPI2C_CR2_START) {
+		return SERIAL_BUSY;
+	}
+
+	// Disable, config, and enable DMA
+
+
+	// Set write request, clear NBYTES value
+	FMPI2C1->CR2 &= ~(FMPI2C_CR2_RD_WRN | FMPI2C_CR2_NBYTES_Msk);
+
+	// Set NBYTES transfer size, autoend mode, start bit - begins transfer
+	FMPI2C1->CR2 |= (((size + I2C_ADDRESS_SIZE) << FMPI2C_CR2_NBYTES_Pos)
+					| FMPI2C_CR2_AUTOEND | FMPI2C_CR2_START);
+
+
+
+	return SERIAL_OK;
+
+}
+
+SerialStatus FMPI2C1_MemRead(uint8_t address, uint8_t *data, uint8_t size) {
+
+	// Check if previous start has been sent already
+	if (FMPI2C1->CR2 & FMPI2C_CR2_START) {
+		return SERIAL_BUSY;
+	}
+
+	// Disable, config DMA
+
+
+	// Set write request, software end mode, clear NBYTES value
+	FMPI2C1->CR2 &= ~(FMPI2C_CR2_RD_WRN | FMPI2C_CR2_AUTOEND
+					| FMPI2C_CR2_NBYTES_Msk);
+
+	// Set NBYTES transfer size,
+	FMPI2C1->CR2 |= ((I2C_ADDRESS_SIZE << FMPI2C_CR2_NBYTES_Pos)
+					| FMPI2C_CR2_START);
+
+	// Check ready to send, then send address
+	while (!(FMPI2C1->ISR & FMPI2C_ISR_TXE));
+	FMPI2C1->TXDR = address;
+
+	// Software end - wait transfer complete flag
+	while (!(FMPI2C1->ISR & FMPI2C_ISR_TC));
+
+	// Enable DMA
+
+
+	// Clear NBYTES transfer size,
+	FMPI2C1->CR2 &= ~(FMPI2C_CR2_NBYTES_Msk);
+
+	// Set NBYTES transfer size, read request, autoend mode, start bit - begins transfer
+	FMPI2C1->CR2 |= ((size << FMPI2C_CR2_NBYTES_Pos) | FMPI2C_CR2_RD_WRN
+					| FMPI2C_CR2_AUTOEND | FMPI2C_CR2_START);
+
 
 	return SERIAL_OK;
 
